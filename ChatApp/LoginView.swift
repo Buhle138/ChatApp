@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import Firebase
 
-struct ContentView: View {
+struct LoginView: View {
     
     @State var isLoginMode = false
     @State var email = ""
     @State var password = ""
+    
+ 
+
     
     var body: some View {
         NavigationView {
@@ -53,7 +57,7 @@ struct ContentView: View {
                         .background(.white)
                     
                     Button{
-                        
+                        handleAction()
                     }label: {
                         HStack{
                             
@@ -65,6 +69,9 @@ struct ContentView: View {
                         }.background(Color.blue)
                     }
                     
+                    
+                    Text(self.loginStatusMessage)
+                        .foregroundColor(.red)
 
                    
                 }
@@ -77,11 +84,36 @@ struct ContentView: View {
              
                 .navigationTitle(isLoginMode ? "Login" : "Create Account")
         }
+       
+    }
+    
+    private func handleAction(){
+        if isLoginMode{
+            print("Should log into Firebase with existing credentials")
+        }else {
+            createNewAccount()
+        }
+    }
+    
+    @State var loginStatusMessage = ""
+    
+    private func createNewAccount(){
+        Auth.auth().createUser(withEmail: email, password: password){
+            result, error in
+            if let error = error {
+                self.loginStatusMessage = "Failed to create user: \(error)"
+                return
+            }
+            
+            print("Successfully created user: \(result?.user.uid ?? "")")
+            
+            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        LoginView()
     }
 }
