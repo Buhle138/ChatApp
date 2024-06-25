@@ -89,13 +89,27 @@ struct LoginView: View {
     
     private func handleAction(){
         if isLoginMode{
-            print("Should log into Firebase with existing credentials")
+            loginUser()
         }else {
             createNewAccount()
         }
     }
     
     @State var loginStatusMessage = ""
+    
+    private func loginUser() {
+        Auth.auth().signIn(withEmail: email, password: password){
+            result, error in
+            if let error = error {
+                self.loginStatusMessage = "Failed to login user: \(error)"
+                return
+            }
+            
+            print("Successfully logged in as user: \(result?.user.uid ?? "")")
+            
+            self.loginStatusMessage = "Successfully logged in as user: \(result?.user.uid ?? "")"
+        }
+    }
     
     private func createNewAccount(){
         Auth.auth().createUser(withEmail: email, password: password){
