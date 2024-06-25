@@ -13,6 +13,7 @@ struct LoginView: View {
     @State var isLoginMode = false
     @State var email = ""
     @State var password = ""
+    @State var shouldShowImagePicker = false
     
  
 
@@ -34,9 +35,9 @@ struct LoginView: View {
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
                     
-                    if isLoginMode{
+                    if  !isLoginMode{
                         Button{
-                            
+                            shouldShowImagePicker.toggle()
                         }label: {
                             Image(systemName: "person.fill")
                                 .font(.system(size: 64))
@@ -78,14 +79,17 @@ struct LoginView: View {
                     
                 }
                 .padding()
-                .background(Color(.init(white: 0, alpha: 0.05)))
-            
-                
-             
                 .navigationTitle(isLoginMode ? "Login" : "Create Account")
+                .background(Color(.init(white: 0, alpha: 0.05)))
+               
+        }
+        .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
+         ImagePicker(image: $image)
         }
        
     }
+    
+    @State var image: UIImage?
     
     private func handleAction(){
         if isLoginMode{
