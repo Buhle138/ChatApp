@@ -8,6 +8,24 @@
 import SwiftUI
 import Firebase
 
+class FirebaseManager: NSObject{
+
+    let auth: Auth
+
+    static let shared = FirebaseManager()
+
+    override init(){
+        FirebaseApp.configure()
+
+        self.auth = Auth.auth()
+
+        super.init()
+
+
+    }
+
+}
+
 struct LoginView: View {
     
     @State var isLoginMode = false
@@ -39,8 +57,29 @@ struct LoginView: View {
                         Button{
                             shouldShowImagePicker.toggle()
                         }label: {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 64))
+                            
+                            VStack{
+                                
+                                if let image = self.image{
+                                    Image(uiImage: image)
+                                    //reducing the large image
+                                        .resizable()
+                                        .frame(width: 128, height: 128)
+                                        .scaledToFill()
+                                        .cornerRadius(64)
+                                }else{
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 64))
+                                        .padding()
+                                        .foregroundColor(Color(.label))
+                                }
+                                
+                            }
+                            .overlay(RoundedRectangle(cornerRadius: 64)
+                                .stroke(Color.black, lineWidth: 3))
+                          
+                           
+                        
                         }
                     }
                     
@@ -126,7 +165,15 @@ struct LoginView: View {
             print("Successfully created user: \(result?.user.uid ?? "")")
             
             self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+            
+            self.persistImageToStorage()
         }
+    }
+
+    private func persistImageToStorage(){
+
+        
+
     }
 }
 
