@@ -8,12 +8,14 @@
 import SwiftUI
 import Firebase
 import FirebaseStorage
+import FirebaseFirestore
 
 
 class FirebaseManager: NSObject {
     
     let auth: Auth
     let storage: Storage
+    let firestore: Firestore
     
     static let shared = FirebaseManager()
     
@@ -22,6 +24,7 @@ class FirebaseManager: NSObject {
       
       self.auth = Auth.auth()
       self.storage = Storage.storage()
+      self.firestore = Firestore.firestore()
       
       super.init()
     }
@@ -35,8 +38,8 @@ struct LoginView: View {
     @State var password = ""
     @State var shouldShowImagePicker = false
     
- 
-
+    
+    
     
     var body: some View {
         NavigationView {
@@ -50,7 +53,7 @@ struct LoginView: View {
                         Text("Create Account")
                             .tag(false)
                     } label: {
-                       Text("Picker Here")
+                        Text("Picker Here")
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
@@ -79,13 +82,13 @@ struct LoginView: View {
                             }
                             .overlay(RoundedRectangle(cornerRadius: 64)
                                 .stroke(Color.black, lineWidth: 3))
-                          
-                           
-                        
+                            
+                            
+                            
                         }
                     }
                     
-                   
+                    
                     
                     
                     TextField("Email", text: $email)
@@ -93,7 +96,7 @@ struct LoginView: View {
                         .autocapitalization(.none)
                         .padding(12)
                         .background(.white)
-                       
+                    
                     SecureField("Password", text: $password)
                         .padding(12)
                         .background(.white)
@@ -114,20 +117,20 @@ struct LoginView: View {
                     
                     Text(self.loginStatusMessage)
                         .foregroundColor(.red)
-
-                   
-                }
+                    
                     
                 }
-                .padding()
-                .navigationTitle(isLoginMode ? "Login" : "Create Account")
-                .background(Color(.init(white: 0, alpha: 0.05)))
-               
+                
+            }
+            .padding()
+            .navigationTitle(isLoginMode ? "Login" : "Create Account")
+            .background(Color(.init(white: 0, alpha: 0.05)))
+            
         }
         .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
-         ImagePicker(image: $image)
+            ImagePicker(image: $image)
         }
-       
+        
     }
     
     @State var image: UIImage?
@@ -171,15 +174,59 @@ struct LoginView: View {
             self.persistImageToStorage()
         }
     }
-
+    
     private func persistImageToStorage(){
-        FirebaseManager.shared
+    
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
+        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else {return}
+        ref.putData(imageData) { metadata, err in
+            if let err = err {
+                self.loginStatusMessage = "Failed to push image to storage: \(err)"
+                return
+            }
+            
+            ref.downloadURL { url, err in
+                ref.putData(imageData) { metadata, err in
+                    if let err = err {
+                        self.loginStatusMessage = "Failed to retrieve download url: \(err)"
+                        return
+                    }
+                    
+                    self.loginStatusMessage = "Successfully stored iamge with url: \(url?.absoluteString ?? "")"
+                    
+                    //making the Url optional so that it does not have to be an optional at the parameters
+                    guard let url = url else {return}
+                    storeUserInformation(imageProfileUrl: url)
+                }
+            }
+        }
+        
+    func storeUserInformation(imageProfileUrl: URL){
+          
+            guard let uid = FirebaseManager.shared.auth.currentUser?.uid else{
+                return
+            }
+            
+            let userData = ["email": self.email, "uid": uid, "profileImageUrl": imageProfileUrl.absoluteString]
+            //adding the document to firestore
+            FirebaseManager.shared.firestore.collection("users")
+                .document(uid).setData(userData){err in
+                    if let err = err {
+                        print(err)
+                        self.loginStatusMessage = "\(err)"
+                        return
+                    }
+                    
+                    print("Success")
+                }
+        }
         
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
+    
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            LoginView()
+        }
     }
-}
+    }
