@@ -7,23 +7,25 @@
 
 import SwiftUI
 import Firebase
+import FirebaseStorage
 
-class FirebaseManager: NSObject{
 
+class FirebaseManager: NSObject {
+    
     let auth: Auth
-
+    let storage: Storage
+    
     static let shared = FirebaseManager()
-
-    override init(){
+    
+  override  init() {
         FirebaseApp.configure()
-
-        self.auth = Auth.auth()
-
-        super.init()
-
-
+      
+      self.auth = Auth.auth()
+      self.storage = Storage.storage()
+      
+      super.init()
     }
-
+    
 }
 
 struct LoginView: View {
@@ -141,7 +143,7 @@ struct LoginView: View {
     @State var loginStatusMessage = ""
     
     private func loginUser() {
-        Auth.auth().signIn(withEmail: email, password: password){
+        FirebaseManager.shared.auth.signIn(withEmail: email, password: password){
             result, error in
             if let error = error {
                 self.loginStatusMessage = "Failed to login user: \(error)"
@@ -155,7 +157,7 @@ struct LoginView: View {
     }
     
     private func createNewAccount(){
-        Auth.auth().createUser(withEmail: email, password: password){
+        FirebaseManager.shared.auth.createUser(withEmail: email, password: password){
             result, error in
             if let error = error {
                 self.loginStatusMessage = "Failed to create user: \(error)"
@@ -171,9 +173,8 @@ struct LoginView: View {
     }
 
     private func persistImageToStorage(){
-
+        FirebaseManager.shared
         
-
     }
 }
 
