@@ -7,9 +7,43 @@
 
 import SwiftUI
 
+class MainMessagesViewModel: ObservableObject{
+    
+    @Published var errorMessage = ""
+    
+    init(){
+        fetchCurrentUser()
+    }
+    
+    private func fetchCurrentUser() {
+        self.errorMessage = "Fetching current user"
+        
+        guard let uid =  FirebaseManager.shared.auth.currentUser?.uid else {return}
+        
+        FirebaseManager.shared.firestore.collection("users")
+            .document(uid).getDocument { snapshot, error in
+                
+                if let error = error {
+                    print("Failed to fetch currennt user: ", error)
+                     return
+                }
+                
+                guard let data = snapshot?.data() else {return}
+                print(data)
+              
+            }
+        
+        
+       
+    }
+}
+
 struct MainMessagesView: View {
     
     @State var shouldShowLogOutOptions = false
+    @ObservedObject private var vm = MainMessagesViewModel()
+    
+    
     private var customNavBar: some View {
         HStack(spacing: 16){
             
@@ -63,6 +97,7 @@ struct MainMessagesView: View {
             //Nav bar
             VStack{
                 
+                Text("CURRENT USER ID")
            
                 customNavBar
                 

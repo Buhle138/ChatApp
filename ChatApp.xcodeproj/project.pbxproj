@@ -17,6 +17,7 @@
 		945534E52C2C3C5900C99A45 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 945534E42C2C3C5900C99A45 /* FirebaseFirestore */; };
 		945534E72C2C3C5900C99A45 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 945534E62C2C3C5900C99A45 /* FirebaseStorage */; };
 		945534EA2C2CE0BE00C99A45 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945534E92C2CE0BE00C99A45 /* MainMessagesView.swift */; };
+		945534ED2C2DA98300C99A45 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945534EC2C2DA98300C99A45 /* FirebaseManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		945534C32C2AB73600C99A45 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		945534C52C2AE22900C99A45 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		945534E92C2CE0BE00C99A45 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
+		945534EC2C2DA98300C99A45 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 		945534AF2C29EA2700C99A45 /* ChatApp */ = {
 			isa = PBXGroup;
 			children = (
+				945534EB2C2DA95800C99A45 /* Utilitis */,
 				945534E82C2CE09200C99A45 /* MainMessages */,
 				945534B02C29EA2700C99A45 /* ChatAppApp.swift */,
 				945534B22C29EA2700C99A45 /* LoginView.swift */,
@@ -88,6 +91,14 @@
 				945534E92C2CE0BE00C99A45 /* MainMessagesView.swift */,
 			);
 			path = MainMessages;
+			sourceTree = "<group>";
+		};
+		945534EB2C2DA95800C99A45 /* Utilitis */ = {
+			isa = PBXGroup;
+			children = (
+				945534EC2C2DA98300C99A45 /* FirebaseManager.swift */,
+			);
+			path = Utilitis;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,6 +182,7 @@
 			files = (
 				945534C62C2AE22900C99A45 /* ImagePicker.swift in Sources */,
 				945534EA2C2CE0BE00C99A45 /* MainMessagesView.swift in Sources */,
+				945534ED2C2DA98300C99A45 /* FirebaseManager.swift in Sources */,
 				945534B32C29EA2700C99A45 /* LoginView.swift in Sources */,
 				945534B12C29EA2700C99A45 /* ChatAppApp.swift in Sources */,
 			);
