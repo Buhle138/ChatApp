@@ -50,23 +50,46 @@ struct MainMessagesView: View {
                             HStack(spacing: 16){
                                Image(systemName: "person.fill")
                                     .font(.system(size: 32))
+                                    .padding()
+                                    .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color.black, lineWidth: 1))
+                                
+                                
                                 VStack(alignment: .leading){
                                     Text("Username")
+                                        .font(.system(size: 16, weight: .bold))
                                     Text("Message sent to user")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(Color(.lightGray))
                                 }
                                 Spacer()
                                 Text("22d")
                                     .font(.system(size: 14, weight: .semibold))
                             }
                             Divider()
+                                .padding(.vertical, 8)
                         }.padding(.horizontal)
-                        
-                        
                     }
-                    
                 }
                 
+               
+                Button {
+                    
+                } label: {
+                    HStack{
+                        Spacer()
+                        Text("+ New Message")
+                        Spacer()
+                    }
+                    .foregroundColor(.white)
+                    .padding(.vertical)
+                        .background(Color.blue)
+                        .cornerRadius(32)
+                        .padding(.horizontal)
+                }
             }
+            
+
+            
             .navigationBarHidden(true)
     
         }
