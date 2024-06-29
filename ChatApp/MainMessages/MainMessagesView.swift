@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import SDWebImage
 
 struct ChatUser {
     let uid, email, profileImageUrl: String
@@ -18,6 +19,11 @@ class MainMessagesViewModel: ObservableObject{
     @Published var chatUser: ChatUser?
     
     init(){
+        DispatchQueue.main.async {
+            self.isUserCurrentlyLoggedOut =  FirebaseManager.shared.auth.currentUser?.uid == nil
+           
+        }
+       
         fetchCurrentUser()
     }
     
@@ -59,12 +65,18 @@ class MainMessagesViewModel: ObservableObject{
                 
                 self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
                 
-               
-                
-              
+                print(profileImageUrl)
               
             }
     }
+    
+    @Published var isUserCurrentlyLoggedOut = false
+    
+    func handleSignOut() {
+        isUserCurrentlyLoggedOut.toggle()
+       try? FirebaseManager.shared.auth.signOut()
+    }
+    
 }
 
 struct MainMessagesView: View {
@@ -100,11 +112,18 @@ struct MainMessagesView: View {
     private var customNavBar: some View {
         HStack(spacing: 16){
             
-           
-            Image(systemName: "person.fill")
-                .font(.system(size: 24, weight: .heavy))
+            
+            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+                .resizable()
+                .scaledToFill()
+                .frame(width: 50, height: 50)
+                .clipped()
+                .cornerRadius(50)
+                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                .shadow(radius: 5)
+        
             VStack(alignment: .leading, spacing: 4){
-                Text("\(vm.chatUser?.email ?? "")")
+                Text("\(vm.chatUser?.email.replacingOccurrences(of: "@gmail.com", with: "") ?? "")")
                     .font(.system(size: 24, weight: .bold))
                 
                 HStack{
@@ -134,15 +153,22 @@ struct MainMessagesView: View {
         }
         .padding()
         .actionSheet(isPresented: $shouldShowLogOutOptions) {
-            .init(title: Text("Settings"), message: Text("What do you want to d?"), buttons: [
+            .init(title: Text("Settings"), message: Text("Whats do you want to d?"), buttons: [
                 .destructive(Text("Sign Out"), action: {
                    print("Handle sign out")
+                    vm.handleSignOut()
                 }),
 //                        .default(Text("Default Button")),
                 .cancel()
             ] )
         }
-        
+        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut, onDismiss: nil) {
+            LoginView(didCompleteLoginProcess: {
+                
+                
+                self.vm.isUserCurrentlyLoggedOut = false
+            })
+        }
         
     }
     
