@@ -9,9 +9,6 @@ import SwiftUI
 import SDWebImageSwiftUI
 import SDWebImage
 
-struct ChatUser {
-    let uid, email, profileImageUrl: String
-}
 
 class MainMessagesViewModel: ObservableObject{
     
@@ -59,13 +56,9 @@ class MainMessagesViewModel: ObservableObject{
                 //self.errorMessage = "Data: \(data)"
                 
             //getting the individual details of the user so that we can use them inside of our application.
-                let uid  = data["uid"] as? String ?? ""
-                let email = data["email"] as? String ?? ""
-                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
                 
-                self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+                self.chatUser = .init(data: data)
                 
-                print(profileImageUrl)
               
             }
     }
