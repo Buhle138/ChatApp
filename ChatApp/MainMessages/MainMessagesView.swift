@@ -27,7 +27,7 @@ class MainMessagesViewModel: ObservableObject{
         fetchCurrentUser()
     }
     
-    private func fetchCurrentUser() {
+    func fetchCurrentUser() {
      
         
         guard let uid =  FirebaseManager.shared.auth.currentUser?.uid else {
@@ -164,9 +164,10 @@ struct MainMessagesView: View {
         }
         .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut, onDismiss: nil) {
             LoginView(didCompleteLoginProcess: {
-                
-                
                 self.vm.isUserCurrentlyLoggedOut = false
+                
+                //fetching the user one more time so that the current user can be updated correctly.
+                self.vm.fetchCurrentUser()
             })
         }
         
