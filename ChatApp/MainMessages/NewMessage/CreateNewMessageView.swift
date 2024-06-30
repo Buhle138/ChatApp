@@ -9,7 +9,25 @@ import SwiftUI
 
 struct CreateNewMessageView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+       
+        
+        NavigationView {
+            ScrollView{
+                ForEach(0..<10) { num in
+                    Text("New User")
+                }
+            }.navigationTitle("New Message")
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button {
+                            <#code#>
+                        } label: {
+                           Text("Cancel")
+                        }
+
+                    }
+                }
+        }
     }
 }
 
