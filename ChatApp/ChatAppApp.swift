@@ -20,4 +20,6 @@ struct ChatAppApp: App {
            MainMessagesView()
         }
     }
+    
+    
 }

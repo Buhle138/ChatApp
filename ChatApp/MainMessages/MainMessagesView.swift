@@ -166,10 +166,11 @@ struct MainMessagesView: View {
         
     }
     
+    @State var shouldShowNewMessageScreen = false
  
     private var newMessageButton: some  View {
         Button {
-            
+            shouldShowNewMessageScreen.toggle()
         } label: {
             HStack{
                 Spacer()
