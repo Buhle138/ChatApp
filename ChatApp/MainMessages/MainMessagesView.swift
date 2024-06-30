@@ -185,6 +185,9 @@ struct MainMessagesView: View {
                 .padding(.horizontal)
                 .shadow(radius: 15)
         }
+        .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
+            Text("New Message Screen")
+        }
     }
     
     private var messagesView: some View {
