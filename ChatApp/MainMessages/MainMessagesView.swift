@@ -92,22 +92,21 @@ struct MainMessagesView: View {
                 customNavBar
                 
                 messagesView
-                
-                NavigationLink(value: shouldNavigateToChatLogView) {
-                    Text("Chat Log View")
-                }
-                
               
                 
              
             }
+            .navigationDestination(isPresented: $shouldNavigateToChatLogView, destination: {
+                ChatLogView()
+            })
             
 
             .overlay(
                 newMessageButton, alignment: .bottom)
             
     
-        }.navigationBarHidden(true)
+        }
+        .navigationBarHidden(true)
        
     }
     
@@ -199,7 +198,7 @@ struct MainMessagesView: View {
         .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
             //finding the actual user we clicked on the createNewMessageView screen.
             CreateNewMessageView(didSelectNewUser:{ user in
-                print(user.email)
+                self.shouldNavigateToChatLogView.toggle()
                 self.chatUser = user
             })
         }
@@ -241,6 +240,19 @@ struct MainMessagesView: View {
                 }.padding(.horizontal)
             }
         }.padding(.bottom, 50)
+    }
+}
+
+struct ChatLogView: View{
+    var body: some View{
+        ScrollView{
+            
+            ForEach(0..<10) {num in
+                Text("FAKE MESSAGE FOR NOW")
+                
+            }
+            
+        }.navigationTitle("Chat Log View")
     }
 }
 
