@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 class CreateNewMessageViewModel: ObservableObject{
     
@@ -39,6 +40,8 @@ class CreateNewMessageViewModel: ObservableObject{
 
 struct CreateNewMessageView: View {
     
+    let didSelectNewUser: (ChatUser) -> ()
+    
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var vm = CreateNewMessageViewModel()
@@ -52,8 +55,30 @@ struct CreateNewMessageView: View {
                 Text(vm.errorMessage)
                 
                 ForEach(vm.users) { user in
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                        didSelectNewUser(user)
+                    } label: {
+                        HStack{
+                            WebImage(url: URL(string: user.profileImageUrl))
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .scaledToFill()
+                                .clipped()
+                                .cornerRadius(50)
+                                .overlay(RoundedRectangle(cornerRadius: 50)
+                                    .stroke(Color(.label), lineWidth: 2 )
+                                )
+                                
+                            Text(user.email)
+                                .foregroundColor(Color(.label))
+                            Spacer()
+                        }.padding(.horizontal)
+                       Divider()
+                            .padding(.vertical, 8)
+                    }
+
                    
-                    Text(user.email)
                 }
             }.navigationTitle("New Message")
                 .toolbar {
@@ -72,7 +97,7 @@ struct CreateNewMessageView: View {
 
 struct CreateNewMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateNewMessageView()
-       // MainMessagesView()
+    //    CreateNewMessageView()
+    MainMessagesView()
     }
 }

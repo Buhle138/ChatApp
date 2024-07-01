@@ -75,18 +75,29 @@ class MainMessagesViewModel: ObservableObject{
 struct MainMessagesView: View {
     
     @State var shouldShowLogOutOptions = false
+    
+    @State var shouldNavigateToChatLogView = false
+    
     @ObservedObject private var vm = MainMessagesViewModel()
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             //Nav bar
             VStack{
                 
                // Text("CURRENT USER ID \(vm.chatUser?.uid ?? "")" )
+                
+                
            
                 customNavBar
                 
                 messagesView
+                
+                NavigationLink(value: shouldNavigateToChatLogView) {
+                    Text("Chat Log View")
+                }
+                
+              
                 
              
             }
@@ -94,9 +105,9 @@ struct MainMessagesView: View {
 
             .overlay(
                 newMessageButton, alignment: .bottom)
-            .navigationBarHidden(true)
+            
     
-        }
+        }.navigationBarHidden(true)
        
     }
     
@@ -186,34 +197,45 @@ struct MainMessagesView: View {
                 .shadow(radius: 15)
         }
         .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
-           CreateNewMessageView()
+            //finding the actual user we clicked on the createNewMessageView screen.
+            CreateNewMessageView(didSelectNewUser:{ user in
+                print(user.email)
+                self.chatUser = user
+            })
         }
     }
+    
+    @State var chatUser: ChatUser?
     
     private var messagesView: some View {
         ScrollView{
             ForEach(0..<10, id: \.self){num in
                 
                 VStack{
-                    
-                    HStack(spacing: 16){
-                       Image(systemName: "person.fill")
-                            .font(.system(size: 32))
-                            .padding()
-                            .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                    NavigationLink {
+                       Text("Destination")
+                    } label: {
                         
-                        
-                        VStack(alignment: .leading){
-                            Text("Username")
-                                .font(.system(size: 16, weight: .bold))
-                            Text("Message sent to user")
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(.lightGray))
+                        HStack(spacing: 16){
+                           Image(systemName: "person.fill")
+                                .font(.system(size: 32))
+                                .padding()
+                                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                            
+                            
+                            VStack(alignment: .leading){
+                                Text("Username")
+                                    .font(.system(size: 16, weight: .bold))
+                                Text("Message sent to user")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color(.lightGray))
+                            }
+                            Spacer()
+                            Text("22d")
+                                .font(.system(size: 14, weight: .semibold))
                         }
-                        Spacer()
-                        Text("22d")
-                            .font(.system(size: 14, weight: .semibold))
                     }
+
                     Divider()
                         .padding(.vertical, 8)
                 }.padding(.horizontal)
