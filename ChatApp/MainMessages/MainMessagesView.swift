@@ -97,7 +97,7 @@ struct MainMessagesView: View {
              
             }
             .navigationDestination(isPresented: $shouldNavigateToChatLogView, destination: {
-                ChatLogView()
+                ChatLogView(chatUser: self.chatUser)
             })
             
 
@@ -244,6 +244,9 @@ struct MainMessagesView: View {
 }
 
 struct ChatLogView: View{
+    
+    let chatUser: ChatUser?
+    
     var body: some View{
         ScrollView{
             
@@ -252,7 +255,8 @@ struct ChatLogView: View{
                 
             }
             
-        }.navigationTitle("Chat Log View")
+        }.navigationTitle(chatUser?.email ?? "")
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
 
