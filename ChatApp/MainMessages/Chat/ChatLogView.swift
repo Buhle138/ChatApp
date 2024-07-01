@@ -11,23 +11,59 @@ import SwiftUI
 struct ChatLogView: View {
     
     let chatUser: ChatUser?
+    
+    @State var chatText = ""
    
         var body: some View{
-            ScrollView{
-                
-                ForEach(0..<10) {num in
+            VStack{
+                ScrollView{
                     
-                    HStack{
-                        Text("FAKE MESSAGE FOR NOW")
+                    ForEach(0..<10) {num in
+                        
+                        HStack{
+                            Spacer()
+                            HStack{
+                                Text("FAKE MESSAGE FOR NOW")
+                                    .foregroundColor(.white)
+                                   
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                       
+                        
+                        
                     }
-                    .padding()
-                    .background(Color.blue)
                     
+                    HStack{ Spacer() }
                     
                 }
+                .background(Color(.init(white: 0.95, alpha: 1)))
                 
-            }.navigationTitle(chatUser?.email ?? "")
+                HStack{
+                    Image(systemName: "gear")
+                    TextField("Description", text: $chatText)
+                    Button {
+                        
+                    } label: {
+                        Text("Send")
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+
+                }
+                .padding()
+               
+                .navigationTitle(chatUser?.email ?? "")
                 .navigationBarTitleDisplayMode(.inline)
+            }
+           
         }
     
 }
