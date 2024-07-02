@@ -8,11 +8,34 @@
 import SwiftUI
 import Firebase
 
+struct FirebaseConstants {
+    static let fromId = "fromId"
+    static let toId = "toId"
+    static let text = "text"
+}
+//model for fetching the messages.
+struct ChatMessage: Identifiable {
+    
+    var id: String { documentId }
+    
+    let documentId: String
+    
+    let fromId, toId, text: String
+    
+    init(documentId: String, data: [String: Any]) {
+        self.documentId = documentId
+        self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
+        self.toId = data[FirebaseConstants.toId] as? String ?? ""
+        self.text = data[FirebaseConstants.text] as? String ?? ""
+    }
+    
+}
 
 class ChatLogViewModel: ObservableObject{
     
     @Published var chatText = ""
     @Published var errorMessage = ""
+    @Published var chatMessages = [ChatMessage]()
     
     let chatUser: ChatUser?
     
@@ -39,9 +62,21 @@ class ChatLogViewModel: ObservableObject{
                     print(error)
                 }
                 
+                //Preventing the server from  giving us too many messages each time we enter a new message. We want one message at a time to be generated.
+                querySnapshot?.documentChanges.forEach({ change in
+                    if change.type == .added {
+                       let data =  change.document.data()
+                    }
+                })
+                
                 
                 querySnapshot?.documents.forEach({ queryDocumentSnapshot in
-                    queryDocumentSnapshot.data()
+                    let data = queryDocumentSnapshot.data()
+                    let docId = queryDocumentSnapshot.documentID
+                    
+                    let chatMessage = ChatMessage(documentId: docId, data: data)
+                    self.chatMessages.append(chatMessage)
+                    
                 })
             }
     }
@@ -59,7 +94,7 @@ class ChatLogViewModel: ObservableObject{
             .collection(toId)
             .document()
         
-        let messageData = ["fromId": fromId, "toId": toId, "text": self.chatText, "timeStamp": Timestamp()] as [String : Any]
+        let messageData = [FirebaseConstants.fromId: fromId, FirebaseConstants.toId: toId, FirebaseConstants.text: self.chatText, "timeStamp": Timestamp()] as [String : Any]
     
         document.setData(messageData){ error in
             if let error = error {
@@ -130,12 +165,15 @@ struct ChatLogView: View {
     private var messageView: some View {
         ScrollView{
             
-            ForEach(0..<20) {num in
+            ForEach(vm.chatMessages) {message in
+               // Text(message.text)
+           // }
+            //ForEach(0..<20) {num in
                 
                 HStack{
                     Spacer()
                     HStack{
-                        Text("FAKE MESSAGE FOR NOW")
+                        Text(message.text)
                             .foregroundColor(.white)
                            
                     }
