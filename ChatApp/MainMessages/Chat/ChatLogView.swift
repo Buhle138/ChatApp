@@ -55,7 +55,7 @@ class ChatLogViewModel: ObservableObject{
             .collection("messages")
             .document(fromId)
             .collection(toId)
-            .order(by: "timestamp") //ordering our messages from the oldest to the latest.
+            .order(by: "timeStamp") //ordering our messages from the oldest to the latest.
         //for messages we use an addSnapshotListener in order to get messages in real time
             .addSnapshotListener { querySnapshot, error in
                 if let error = error{
@@ -124,7 +124,7 @@ class ChatLogViewModel: ObservableObject{
             
         }
     }
-    
+    @Published var count = 0
 }
 
 struct ChatLogView: View {
@@ -145,6 +145,11 @@ struct ChatLogView: View {
             messageView
             .navigationTitle(chatUser?.email ?? "")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button(action: {
+                vm.count += 1
+            }, label: {
+                Text("Count: \(vm.count)")
+            }))
             
       
         }
@@ -152,48 +157,33 @@ struct ChatLogView: View {
     private var messageView: some View {
         ScrollView{
             
-            ForEach(vm.chatMessages) {message in
-                
+            //We are using the scrollview reader so that when the user enters a message the scrollview can automatically scroll down to reveal the latest message.
+            ScrollViewReader {ScrollViewProxy in
                 VStack{
-                    //making sure that the user that sends the message is white.
-                    if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
-                        HStack{
-                            Spacer()
-                            HStack{
-                                Text(message.text)
-                                    .foregroundColor(.white)
-                                   
-                            }
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(8)
-                        }
-                        //else statement ensures that  the user that receives the messages receives messages with white background!
-                    }else{
-                        HStack{
-                            HStack{
-                                Text(message.text)
-                                    .foregroundColor(.black)
-                                   
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            Spacer()
-                        }
+                    ForEach(vm.chatMessages) {message in
                         
+                        MessageView(message: message)
+                       
                     }
+                    
+                    HStack{ Spacer() }
+                        .id("Empty")
+                     
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                
+                .onReceive(vm.$count){_ in
+                    
+                    withAnimation(.easeOut(duration: 0.5)) {
+                        ScrollViewProxy.scrollTo("Empty", anchor: .bottom)
+                    }
+                    
+                    
+                }
                
-               
-                
-                
             }
             
-            HStack{ Spacer() }
+           
+            
+           
             
         }
         .background(Color(.init(white: 0.95, alpha: 1)))
@@ -247,8 +237,48 @@ struct ChatLogView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
     }
-   
+}
+
+struct MessageView: View {
     
+    let message: ChatMessage
+    
+    var body: some View {
+        VStack{
+            //making sure that the user that sends the message is white.
+            if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                HStack{
+                    Spacer()
+                    HStack{
+                        Text(message.text)
+                            .foregroundColor(.white)
+                           
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                }
+                //else statement ensures that  the user that receives the messages receives messages with white background!
+            }else{
+                HStack{
+                    HStack{
+                        Text(message.text)
+                            .foregroundColor(.black)
+                           
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    Spacer()
+                }
+                
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
+        
+       
+    }
 }
 
 struct ChatLogView_Previews: PreviewProvider {
@@ -256,7 +286,7 @@ struct ChatLogView_Previews: PreviewProvider {
 //        NavigationView {
 //            ChatLogView(chatUser: .init(data: ["uid": "g8DbNrAijnapTnfIjTmBl5xBWxX2", "email": "fake@gmail.com"]))
 //        }
-//
+
         MainMessagesView()
     }
 }
