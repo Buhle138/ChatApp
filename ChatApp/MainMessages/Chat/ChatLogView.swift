@@ -8,25 +8,37 @@
 import SwiftUI
 
 
+class ChatLogViewModel: ObservableObject{
+    
+    init() {
+        
+    }
+    
+    func handleSend(text:  String){
+        
+    }
+    
+}
+
 struct ChatLogView: View {
     
     let chatUser: ChatUser?
     
     @State var chatText = ""
+    
+    @ObservedObject var vm = ChatLogViewModel()
    
         var body: some View{
-            
-            ZStack{
-                messageView
-               
-                
-                VStack{
-                    Spacer()
-                    chatBottomBar
-                        .background(Color.white)
-                }
-             
-            }
+            messageView
+//            ZStack{
+//
+//                VStack{
+//                    Spacer()
+//                    chatBottomBar
+//                        .background(Color.white)
+//                }
+//
+//            }
             
 //            VStack{
 //
@@ -66,7 +78,10 @@ struct ChatLogView: View {
             
         }
         .background(Color(.init(white: 0.95, alpha: 1)))
-        .padding(.bottom, 65)
+        .safeAreaInset(edge: .bottom) {
+            chatBottomBar
+                .background(Color(.systemBackground).ignoresSafeArea())
+        }
     }
     
     private var chatBottomBar: some View {
@@ -74,10 +89,32 @@ struct ChatLogView: View {
             Image(systemName: "photo.on.rectangle")
                 .font(.system(size: 24))
                 .foregroundColor(Color(.darkGray))
-           
-            TextField("Description", text: $chatText)
-            Button {
+            
+            ZStack{
+        
+                TextEditor(text: $chatText)
+                    .opacity(chatText.isEmpty ? 0.5 : 1)
                 
+                
+                //Adding a placeholder into the TextEditor!
+                if chatText.isEmpty {
+                    VStack {
+                        HStack{
+                            Text("Description")
+                                .foregroundStyle(.tertiary)
+                                .padding(.leading, 5)
+                            Spacer()
+                        }
+                    }
+                }
+                
+                
+            }
+            .frame(height: 40)
+           
+            
+            Button {
+                vm.handleSend(text: self.chatText)
             } label: {
                 Text("Send")
                     .foregroundColor(.white)
