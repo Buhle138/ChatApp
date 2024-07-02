@@ -55,6 +55,7 @@ class ChatLogViewModel: ObservableObject{
             .collection("messages")
             .document(fromId)
             .collection(toId)
+            .order(by: "timestamp") //ordering our messages from the oldest to the latest.
         //for messages we use an addSnapshotListener in order to get messages in real time
             .addSnapshotListener { querySnapshot, error in
                 if let error = error{
@@ -153,19 +154,40 @@ struct ChatLogView: View {
             
             ForEach(vm.chatMessages) {message in
                 
-                HStack{
-                    Spacer()
-                    HStack{
-                        Text(message.text)
-                            .foregroundColor(.white)
-                           
+                VStack{
+                    //making sure that the user that sends the message is white.
+                    if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                        HStack{
+                            Spacer()
+                            HStack{
+                                Text(message.text)
+                                    .foregroundColor(.white)
+                                   
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
+                        //else statement ensures that  the user that receives the messages receives messages with white background!
+                    }else{
+                        HStack{
+                            HStack{
+                                Text(message.text)
+                                    .foregroundColor(.black)
+                                   
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            Spacer()
+                        }
+                        
                     }
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
+                
+               
                
                 
                 
