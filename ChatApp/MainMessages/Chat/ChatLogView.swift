@@ -19,6 +19,31 @@ class ChatLogViewModel: ObservableObject{
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
         
+        fetchMessages()
+        
+    }
+    
+    
+    
+    private func fetchMessages() {
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = chatUser?.uid else {return}
+        FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+        //for messages we use an addSnapshotListener in order to get messages in real time
+            .addSnapshotListener { querySnapshot, error in
+                if let error = error{
+                    self.errorMessage = "Failed to listen for messages: \(error)"
+                    print(error)
+                }
+                
+                
+                querySnapshot?.documents.forEach({ queryDocumentSnapshot in
+                    queryDocumentSnapshot.data()
+                })
+            }
     }
     
     func handleSend(text:  String){
