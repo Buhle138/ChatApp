@@ -39,7 +39,26 @@ class ChatLogViewModel: ObservableObject{
         document.setData(messageData){ error in
             if let error = error {
                 self.errorMessage = "Failed to save message into firestore: \(error)"
+                return
             }
+            
+            print("Successfully saved current user sending message")
+            self.chatText = ""
+            
+        }
+        let recipientMessageDocument =   FirebaseManager.shared.firestore
+              .collection("messages")
+              .document(toId)
+              .collection(fromId)
+              .document()
+        
+        recipientMessageDocument.setData(messageData){ error in
+            if let error = error {
+                self.errorMessage = "Failed to save message into firestore: \(error)"
+                return
+            }
+            
+            print("Recipiend saved message as well")
             
         }
     }
@@ -48,6 +67,7 @@ class ChatLogViewModel: ObservableObject{
 
 struct ChatLogView: View {
     
+   
     let chatUser: ChatUser?
     
     init(chatUser: ChatUser?){
@@ -58,6 +78,8 @@ struct ChatLogView: View {
     @ObservedObject var vm: ChatLogViewModel
    
         var body: some View{
+            
+            
             messageView
 //            ZStack{
 //
@@ -163,9 +185,10 @@ struct ChatLogView: View {
 
 struct ChatLogView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ChatLogView(chatUser: .init(data: ["uid": "g8DbNrAijnapTnfIjTmBl5xBWxX2", "email": "fake@gmail.com"]))
-        }
-   
+//        NavigationView {
+//            ChatLogView(chatUser: .init(data: ["uid": "g8DbNrAijnapTnfIjTmBl5xBWxX2", "email": "fake@gmail.com"]))
+//        }
+//
+        MainMessagesView()
     }
 }
