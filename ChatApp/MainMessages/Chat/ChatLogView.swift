@@ -66,18 +66,19 @@ class ChatLogViewModel: ObservableObject{
                 querySnapshot?.documentChanges.forEach({ change in
                     if change.type == .added {
                        let data =  change.document.data()
+                        let chatMessage = ChatMessage(documentId: change.document.documentID, data: data)
+                        self.chatMessages.append(chatMessage)
                     }
                 })
                 
                 
-                querySnapshot?.documents.forEach({ queryDocumentSnapshot in
-                    let data = queryDocumentSnapshot.data()
-                    let docId = queryDocumentSnapshot.documentID
-                    
-                    let chatMessage = ChatMessage(documentId: docId, data: data)
-                    self.chatMessages.append(chatMessage)
-                    
-                })
+//                querySnapshot?.documents.forEach({ queryDocumentSnapshot in
+//                    let data = queryDocumentSnapshot.data()
+//                    let docId = queryDocumentSnapshot.documentID
+//                    let chatMessage = ChatMessage(documentId: docId, data: data)
+//                    self.chatMessages.append(chatMessage)
+//
+//                })
             }
     }
     
@@ -141,21 +142,6 @@ struct ChatLogView: View {
             
             
             messageView
-//            ZStack{
-//
-//                VStack{
-//                    Spacer()
-//                    chatBottomBar
-//                        .background(Color.white)
-//                }
-//
-//            }
-            
-//            VStack{
-//
-//
-//
-//            }
             .navigationTitle(chatUser?.email ?? "")
             .navigationBarTitleDisplayMode(.inline)
             
@@ -166,9 +152,6 @@ struct ChatLogView: View {
         ScrollView{
             
             ForEach(vm.chatMessages) {message in
-               // Text(message.text)
-           // }
-            //ForEach(0..<20) {num in
                 
                 HStack{
                     Spacer()
