@@ -247,8 +247,8 @@ struct MainMessagesView: View {
 
 struct MainMessagesView_Previews: PreviewProvider {
     static var previews: some View {
-        MainMessagesView()
-            .preferredColorScheme(.dark)
+//        MainMessagesView()
+//            .preferredColorScheme(.dark)
         MainMessagesView()
         
     }

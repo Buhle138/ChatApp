@@ -72,6 +72,12 @@ class ChatLogViewModel: ObservableObject{
                     }
                 })
                 
+                //We are placing the count here so that when app loads the chat log the scrollview automatically scrolls to the very bottom of the chat.
+                
+                DispatchQueue.main.async {
+                    self.count += 1
+                }
+                
                 
 //                querySnapshot?.documents.forEach({ queryDocumentSnapshot in
 //                    let data = queryDocumentSnapshot.data()
@@ -108,6 +114,9 @@ class ChatLogViewModel: ObservableObject{
             self.chatText = ""
             
         }
+        
+       
+        
         let recipientMessageDocument =   FirebaseManager.shared.firestore
               .collection("messages")
               .document(toId)
@@ -122,8 +131,29 @@ class ChatLogViewModel: ObservableObject{
             
             print("Recipiend saved message as well")
             
+            self.persistRecentMessage()
+            
+            self.chatText = ""
+            self.count += 1
+            
         }
     }
+    
+    private func persistRecentMessage() {
+        
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        
+        guard let toId = self.chatUser?.uid else {return}
+        
+         let document = FirebaseManager.shared.firestore.collection("recent_messages")
+            .document(uid)
+            .collection("messages")
+            .document(toId) //person we are sending the message to
+        
+       
+    }
+    
+    
     @Published var count = 0
 }
 
@@ -145,14 +175,9 @@ struct ChatLogView: View {
             messageView
             .navigationTitle(chatUser?.email ?? "")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button(action: {
-                vm.count += 1
-            }, label: {
-                Text("Count: \(vm.count)")
-            }))
-            
-      
         }
+    
+    static let emptyScrollToString = "Empty"
     
     private var messageView: some View {
         ScrollView{
@@ -167,13 +192,13 @@ struct ChatLogView: View {
                     }
                     
                     HStack{ Spacer() }
-                        .id("Empty")
+                        .id(Self.emptyScrollToString)
                      
                 }
                 .onReceive(vm.$count){_ in
                     
                     withAnimation(.easeOut(duration: 0.5)) {
-                        ScrollViewProxy.scrollTo("Empty", anchor: .bottom)
+                        ScrollViewProxy.scrollTo(Self.emptyScrollToString, anchor: .bottom)
                     }
                     
                     
