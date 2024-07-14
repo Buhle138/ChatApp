@@ -12,6 +12,8 @@ struct FirebaseConstants {
     static let fromId = "fromId"
     static let toId = "toId"
     static let text = "text"
+    static let profileImageUrl = "profileImageUrl"
+    static let email = "email"
 }
 //model for fetching the messages.
 struct ChatMessage: Identifiable {
@@ -111,7 +113,6 @@ class ChatLogViewModel: ObservableObject{
             }
             
             print("Successfully saved current user sending message")
-            self.chatText = ""
             
         }
         
@@ -141,6 +142,10 @@ class ChatLogViewModel: ObservableObject{
     
     private func persistRecentMessage() {
         
+        //getting rid of the optional chaining in chatUser
+        
+        guard let chatUser = chatUser else {return}
+        
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
         
         guard let toId = self.chatUser?.uid else {return}
@@ -150,7 +155,23 @@ class ChatLogViewModel: ObservableObject{
             .collection("messages")
             .document(toId) //person we are sending the message to
         
-       
+        //using a time stamp in order to arrange the messsages
+        let data = [
+            "timestamp": Timestamp(),
+            FirebaseConstants.text: self.chatText,
+            FirebaseConstants.fromId: uid,
+            FirebaseConstants.toId: toId,
+            FirebaseConstants.profileImageUrl: chatUser.profileImageUrl,
+            FirebaseConstants.email: chatUser.email
+        ] as [String: Any]
+        
+        document.setData(data) {error in
+            if let error = error {
+                self.errorMessage = "Failed to save recent message: \(error)"
+                print("Failed to save recent message: \(error)")
+                return
+            }
+        }
     }
     
     

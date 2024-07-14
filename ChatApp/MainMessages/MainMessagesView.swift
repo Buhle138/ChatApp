@@ -10,10 +10,18 @@ import SDWebImageSwiftUI
 import SDWebImage
 
 
+
+struct RecentMessage: Identifiable {
+    let text, fromId, toId: String
+    let timestamp: Firebase.Timestamp
+    
+}
+
 class MainMessagesViewModel: ObservableObject{
     
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
+    @Published var isUserCurrentlyLoggedOut = false
     
     init(){
         DispatchQueue.main.async {
