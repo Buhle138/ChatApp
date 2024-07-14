@@ -8,12 +8,29 @@
 import SwiftUI
 import SDWebImageSwiftUI
 import SDWebImage
+import Firebase
 
 
 
 struct RecentMessage: Identifiable {
-    let text, fromId, toId: String
+    
+    var id: String {documentId}
+    
+    let documentId: String
+    let text, email: String
+    let fromId, toId: String
+    let profileImageUrl: String
     let timestamp: Firebase.Timestamp
+    
+    init(documentId: String, data: [String: Any]) {
+        self.documentId = documentId
+        self.text = data["text"] as? String ?? ""
+        self.email = data["email"] as? String ?? ""
+        self.fromId = data["fromId"] as? String ?? ""
+        self.toId = data["toId"] as? String ?? ""
+        self.profileImageUrl = data["profileImageUrl"] as? String ?? ""
+        self.timestamp = data["timestamp"] as? Timestamp ?? Timestamp(date: Date())
+    }
     
 }
 
@@ -30,6 +47,36 @@ class MainMessagesViewModel: ObservableObject{
         }
        
         fetchCurrentUser()
+        
+        fetchRecentMessages()
+    }
+    
+    @Published var recentMessages = [RecentMessage]()
+    
+    private func fetchRecentMessages () {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        
+        FirebaseManager.shared.firestore
+            .collection("recent_messages")
+            .document(uid)
+            .collection("messages")
+            .addSnapshotListener { querySnapsshot, error in
+                if let error = error {
+                    self.errorMessage = "Failed to listen for recent messages: \(error)"
+                    print(error)
+                    return
+                }
+                
+                
+                querySnapsshot?.documentChanges.forEach({ change in
+                  
+                        let docId = change.document.documentID
+                        self.recentMessages.append(.init(documentId: docId, data: change.document.data()))
+                  
+                })
+            }
+        
+        
     }
     
     func fetchCurrentUser() {
@@ -71,7 +118,7 @@ class MainMessagesViewModel: ObservableObject{
             }
     }
     
-    @Published var isUserCurrentlyLoggedOut = false
+   
     
     func handleSignOut() {
         isUserCurrentlyLoggedOut.toggle()
@@ -216,7 +263,7 @@ struct MainMessagesView: View {
     
     private var messagesView: some View {
         ScrollView{
-            ForEach(0..<10, id: \.self){num in
+            ForEach(vm.recentMessages){num in
                 
                 VStack{
                     NavigationLink {
@@ -255,8 +302,7 @@ struct MainMessagesView: View {
 
 struct MainMessagesView_Previews: PreviewProvider {
     static var previews: some View {
-//        MainMessagesView()
-//            .preferredColorScheme(.dark)
+
         MainMessagesView()
         
     }
